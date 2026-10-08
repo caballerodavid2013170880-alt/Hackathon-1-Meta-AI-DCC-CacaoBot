@@ -1,0 +1,69 @@
+// Endpoint permanente conectado a tu Google Colab vía Ngrok
+const GRADIO_API_URL = "https://such-frays-overall.ngrok-free.dev";
+
+async function consultarAsistente(mensajeUsuario) {
+  const base = (window.AppState && window.AppState.gradioUrl) 
+    ? window.AppState.gradioUrl.replace(/\/api\/predict\/?$/, '').replace(/\/+$/, '')
+    : GRADIO_API_URL.replace(/\/api\/predict\/?$/, '').replace(/\/+$/, '');
+
+  try {
+    let datos = null;
+
+    // 1. Compatibilidad con Gradio 6+ (Event stream / SSE de Colab en vivo)
+    try {
+      const callRes = await fetch(`${base}/gradio_api/call/ui_handler`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "ngrok-skip-browser-warning": "true"
+        },
+        body: JSON.stringify({ data: [mensajeUsuario] })
+      });
+      if (callRes.ok) {
+        const { event_id } = await callRes.json();
+        const streamRes = await fetch(`${base}/gradio_api/call/ui_handler/${event_id}`, {
+          headers: { "ngrok-skip-browser-warning": "true" }
+        });
+        const streamText = await streamRes.text();
+        const match = streamText.match(/data:\s*(\[[\s\S]*?\])(?:\n|$)/);
+        if (match) {
+          datos = { data: JSON.parse(match[1]) };
+        }
+      }
+    } catch (eGradio6) {
+      console.warn("Fallo endpoint Gradio 6 SSE, intentando fallback:", eGradio6);
+    }
+
+    // 2. Fallback a endpoint clásico /api/predict (Gradio 3/4)
+    if (!datos) {
+      const respuesta = await fetch(`${base}/api/predict`, {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/json",
+          "ngrok-skip-browser-warning": "true" // Omite la pantalla intermedia de Ngrok en llamadas fetch
+        },
+        body: JSON.stringify({ data: [mensajeUsuario] })
+      });
+      datos = await respuesta.json();
+    }
+    
+    // Gradio entrega: [badge_html, alerta_humano, respuesta_texto, contexto_rag]
+    const respuestaTexto = (datos && datos.data) ? datos.data[2] : "No se recibió respuesta.";
+    const alertaHumano = (datos && datos.data) ? datos.data[1] : "";
+    const badgeHtml = (datos && datos.data) ? datos.data[0] : "";
+    const contextoRag = (datos && datos.data) ? datos.data[3] : "";
+    
+    return {
+      respuesta: respuestaTexto,
+      esEscalado: typeof alertaHumano === "string" && alertaHumano.includes("Escalado activado"),
+      badge: badgeHtml,
+      contexto: contextoRag
+    };
+  } catch (error) {
+    console.error("Error conectando con Cacao Ancestral AI:", error);
+    return {
+      respuesta: "En este momento nuestro taller está ocupado. Intenta de nuevo en unos instantes.",
+      esEscalado: false
+    };
+  }
+}

@@ -1,0 +1,127 @@
+# =========================================================================
+# CACAO ANCESTRAL CDMX — REGLAS DE SEGURIDAD Y ARCHIVOS IGNORADOS (.gitignore)
+# =========================================================================
+
+# -------------------------------------------------------------------------
+# 1. VARIABLES DE ENTORNO Y ARCHIVOS DE SECRETOS / CONTRASEÑAS
+# -------------------------------------------------------------------------
+# Bloquea cualquier archivo de variables de entorno que contenga claves reales
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.*
+*.env
+
+# Permitir explícitamente el archivo de plantilla con referencias seguras
+!.env.example
+
+# -------------------------------------------------------------------------
+# 2. CREDENCIALES, TOKENS Y CLAVES DE SERVICIO (FIREBASE / GOOGLE CLOUD)
+# -------------------------------------------------------------------------
+# Claves de cuentas de servicio con permisos administrativos
+*serviceAccountKey*.json
+*firebase-adminsdk*.json
+google-services.json
+GoogleService-Info.plist
+.runtimeconfig.json
+
+# Claves de configuración del cliente si se crean de forma local
+**/config.js
+!**/config.example.js
+**/public/js/config.js
+
+# Llaves criptográficas, certificados y almacenes de claves
+*.pem
+*.key
+*.pfx
+*.p12
+*.crt
+*.csr
+*.cer
+
+# -------------------------------------------------------------------------
+# 3. FIREBASE CLI Y REGISTROS DE DEPURACIÓN
+# -------------------------------------------------------------------------
+# Caché local y sesiones de Firebase CLI
+.firebase/
+
+# Logs de depuración (pueden contener encabezados y parámetros confidenciales)
+firebase-debug.log*
+firestore-debug.log*
+ui-debug.log*
+database-debug.log*
+
+# Logs de gestores de paquetes
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.log
+
+# -------------------------------------------------------------------------
+# 4. BASES DE DATOS PRIVADAS Y REGISTROS DE CLIENTES
+# -------------------------------------------------------------------------
+# Archivos de Excel o exportaciones que contengan datos reales de clientes
+*_privado.xlsx
+*_real.xlsx
+*leads*.xlsx
+*clientes*.xlsx
+*pedidos*.xlsx
+*contactos_export*.xlsx
+cacao_ancestral_db_real.xlsx
+
+# Bases de datos SQLite o volcados SQL
+*.db
+*.sqlite
+*.sqlite3
+*.sql
+*.dump
+*.bak
+public/data/submissions/
+public/data/private/
+
+# -------------------------------------------------------------------------
+# 5. DEPENDENCIAS Y ENTORNO DE EJECUCIÓN
+# -------------------------------------------------------------------------
+node_modules/
+.pnp
+.pnp.js
+dist/
+build/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+
+# Jupyter Notebook Checkpoints (pueden retener salidas con tokens de API)
+.ipynb_checkpoints/
+
+# -------------------------------------------------------------------------
+# 6. METADATOS DEL SISTEMA OPERATIVO Y DEL EDITOR
+# -------------------------------------------------------------------------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# IDEs y Editores
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+.idea/
+*.sublime-project
+*.sublime-workspace
+/CacaoAncestral
+/.vscode
+/Hackathon-1-Meta-AI-DCC-CacaoBot/
+auditoria_web_y_ficha_tecnica_ui_ux_aranda_chocolates.md
